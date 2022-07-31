@@ -25,12 +25,43 @@ from rest_framework import generics
 from rest_framework import filters
 from django.utils.decorators import method_decorator
 
+from rest_framework import generics, permissions, mixins
+from django.contrib.auth.models import User
+#Register 
+
+
+@method_decorator(csrf_exempt)
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def RegisterUser(request):
+    Permission_classes = (permissions.AllowAny,)
+    try:
+        data = {}
+        serializer = RegistrationSerializer(data=request.data)
+        import pdb;pdb.set_trace()
+        if serializer.is_valid():
+            user1 = serializer.save()
+            user1.save()
+            if user1:
+                data['id'] = user1.id
+                data['username'] = user1.username
+                data['password'] = user1.password
+                data['email'] = user1.email
+                data['first_name'] =user1.first_name
+                data['last_name'] = user1.last_name
+                return Response(data)                
+        else:
+            data = serializer.errors
+    except KeyError as e:
+        print(e)
+        raise ValidationError({"400": f'Field {str(e)} missing'})
+
 @method_decorator(csrf_exempt)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login_user(request):
     data = {}
-    #import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
     print(request.data)
     uname = request.data['username']
     password = request.data['password']
@@ -203,7 +234,7 @@ class OrderItem(APIView):
                 return Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
 
-#@method_decorator(csrf_exempt)
+
 class AddCartItem(APIView):
     serializer_class = CartItemSerializer
     permission_classes = [permissions.AllowAny]
@@ -233,6 +264,7 @@ class ProductsSearch(generics.ListCreateAPIView):
     filter_backends = (filters.SearchFilter,)
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    
 
 class OrderList(APIView):
     authentication_classes = [authentication.TokenAuthentication]
@@ -253,16 +285,18 @@ class ItemsFetch(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace() 
         name = self.request.query_params.get('name')
         try:
             price = self.request.query_params.get('price')
         except:
             pass
         category = self.request.query_params.get('category')
-        rating = self.request.query_params.get('rating')
+        #rating = self.request.query_params.get('rating')
 
         orders = Item.objects.filter(Q(Item_name__icontains = name) | Q(Item_category = category) | Q(Item_max_price=price)).values('Item_name','Item_category','Item_max_price')
         serializer = OrderSerializer(orders, many=True)
         return Response(orders)
+
+
 

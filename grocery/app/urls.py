@@ -1,12 +1,11 @@
 from django.urls import path, include,re_path
-from .api import *
 from .views import *
 
 
 urlpatterns=[
     re_path(r'login/',login_user,name='login'),
     re_path(r'logout/',User_logout,name='logout'),
-    path(r'register/', RegisterApi.as_view()),   
+    path(r'register/',RegisterUser,name='register'),   
     path(r'category/', CreateCategories.as_view()), 
     path(r'order/', OrderItem.as_view()),
     path(r'item/', AddProducts.as_view()),
