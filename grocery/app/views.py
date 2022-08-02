@@ -38,7 +38,7 @@ def RegisterUser(request):
     try:
         data = {}
         serializer = RegistrationSerializer(data=request.data)
-        import pdb;pdb.set_trace()
+        #import pdb;pdb.set_trace()
         if serializer.is_valid():
             user1 = serializer.save()
             user1.save()
@@ -61,7 +61,7 @@ def RegisterUser(request):
 @permission_classes([AllowAny])
 def login_user(request):
     data = {}
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     print(request.data)
     uname = request.data['username']
     password = request.data['password']
@@ -292,8 +292,6 @@ class ItemsFetch(generics.ListCreateAPIView):
         except:
             pass
         category = self.request.query_params.get('category')
-        #rating = self.request.query_params.get('rating')
-
         orders = Item.objects.filter(Q(Item_name__icontains = name) | Q(Item_category = category) | Q(Item_max_price=price)).values('Item_name','Item_category','Item_max_price')
         serializer = OrderSerializer(orders, many=True)
         return Response(orders)
